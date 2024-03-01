@@ -39,7 +39,8 @@ func (c *ChainNode[T]) RemoveNode() {
 
 // InsertAsHead method - inserts the given node as the head of the list, and clears out references
 //
-// NOTE: the current node will become the head of the [other] node, the [other] node will become the tail of the current node
+// NOTE: the current node will become the head of the [other] node,
+// the [other] node will become the tail of the current node
 //
 // Example (insert `B` as head of `A`):
 //
