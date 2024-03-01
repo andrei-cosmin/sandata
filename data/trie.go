@@ -121,12 +121,9 @@ func (t *Trie[K, V]) SearchChain(chain *ChainNode[K]) (V, bool) {
 	// Set the cursor to the root
 	cursor := t.root
 
-	// Set the chain cursor to the given chain
-	chainCursor := chain
-
 	for {
 		// Get the key from the chain
-		key := chainCursor.Data
+		key := chain.Data
 
 		// Check if the key is in the paths, and move the cursor to the next node
 		if _, ok := cursor.paths[key]; ok {
@@ -137,8 +134,8 @@ func (t *Trie[K, V]) SearchChain(chain *ChainNode[K]) (V, bool) {
 		}
 
 		// Check if the chain has a next chain, and move the chain cursor to the next chain
-		if chainCursor.HasNext() {
-			chainCursor = chainCursor.NextChain
+		if chain.HasNext() {
+			chain = chain.NextChain
 		} else {
 			// Return the value and the flag of the cursor
 			return cursor.data, cursor.flag

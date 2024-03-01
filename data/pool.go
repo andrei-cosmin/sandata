@@ -10,11 +10,11 @@ type Pool[T any] struct {
 	empty     T
 }
 
-// NewPool method - creates a new pool with the given size
-func NewPool[T any](size uint) *Pool[T] {
+// NewPool method - creates a new pool with the given capacity
+func NewPool[T any](capacity uint) *Pool[T] {
 	return &Pool[T]{
 		cursor:    -1,
-		container: make([]T, size),
+		container: make([]T, capacity),
 	}
 }
 
@@ -44,4 +44,19 @@ func (p *Pool[T]) Pop() (T, bool) {
 		// Return the value and true
 		return value, true
 	}
+}
+
+// Size method - returns the size of the pool (current fill of the pool)
+func (p *Pool[T]) Size() int {
+	return p.cursor + 1
+}
+
+// Capacity method - returns the capacity of the pool
+func (p *Pool[T]) Capacity() int {
+	return len(p.container)
+}
+
+// Empty method - returns true if the pool is empty, false otherwise
+func (p *Pool[T]) Empty() bool {
+	return p.cursor == -1
 }
