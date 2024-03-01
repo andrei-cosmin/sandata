@@ -2,7 +2,6 @@ package data
 
 import (
 	"github.com/andrei-cosmin/sandata/internal/util"
-	"github.com/bits-and-blooms/bitset"
 	"slices"
 )
 
@@ -38,24 +37,18 @@ func (a *Array[T]) Size() uint {
 }
 
 // ClearAll method - clears all the values in the array according to the set bits
-func (a *Array[T]) ClearAll(set *bitset.BitSet) {
-	for index, hasNext := set.NextSet(0); hasNext; index, hasNext = set.NextSet(index + 1) {
-		if index >= uint(len(a.container)) {
-			return
-		}
+func (a *Array[T]) ClearAll(bits Mask) {
+	for index, hasNext := bits.NextSet(0); hasNext && index < uint(len(a.container)); index, hasNext = bits.NextSet(index + 1) {
 		a.container[index] = a.empty
 	}
 }
 
 // ClearAllFunc method - clears all the values in the array according to the set bits
 // and calls `f` for each cleared value
-func (a *Array[T]) ClearAllFunc(set *bitset.BitSet, f func(T)) {
-	for index, hasNext := set.NextSet(0); hasNext; index, hasNext = set.NextSet(index + 1) {
-		if index >= uint(len(a.container)) {
-			return
-		}
-		a.container[index] = a.empty
+func (a *Array[T]) ClearAllFunc(bits Mask, f func(T)) {
+	for index, hasNext := bits.NextSet(0); hasNext && index < uint(len(a.container)); index, hasNext = bits.NextSet(index + 1) {
 		f(a.container[index])
+		a.container[index] = a.empty
 	}
 }
 

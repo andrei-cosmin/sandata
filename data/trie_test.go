@@ -6,8 +6,30 @@ import (
 	"testing"
 )
 
+func getHead[K comparable](node *ChainNode[K]) *ChainNode[K] {
+	previous := node
+
+	for node != nil {
+		previous = node
+		node = node.PreviousChain
+	}
+
+	return previous
+}
+
+func getTail[K comparable](node *ChainNode[K]) *ChainNode[K] {
+	var next *ChainNode[K]
+
+	for node != nil {
+		next = node
+		node = node.NextChain
+	}
+
+	return next
+}
+
 // newChain - creates a new chain from the given keys
-func newChain[T any, K comparable](keys []K) *ChainNode[K] {
+func newChain[K comparable](keys []K) *ChainNode[K] {
 	// If there are no keys, return nil
 	if len(keys) == 0 {
 		return nil
@@ -15,10 +37,11 @@ func newChain[T any, K comparable](keys []K) *ChainNode[K] {
 
 	// Create the root node
 	root := &ChainNode[K]{
-		Data:      keys[0],
-		NextChain: nil,
+		Data: keys[0],
 	}
 
+	// Set previous to nil
+	var previous *ChainNode[K]
 	// Set the cursor to the root
 	cursor := root
 
@@ -26,12 +49,18 @@ func newChain[T any, K comparable](keys []K) *ChainNode[K] {
 	for index := 1; index < len(keys); index++ {
 		// Create the next node
 		cursor.NextChain = &ChainNode[K]{
-			Data:      keys[index],
-			NextChain: nil,
+			Data: keys[index],
 		}
+		// Set the previous node
+		cursor.PreviousChain = previous
+
 		// Set the cursor to the next node
+		previous = cursor
 		cursor = cursor.NextChain
 	}
+
+	// Set the previous node of the last node
+	cursor.PreviousChain = previous
 
 	// Return the root of the chain
 	return root
