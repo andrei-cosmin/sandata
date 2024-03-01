@@ -47,6 +47,18 @@ func (a *Array[T]) ClearAll(set *bitset.BitSet) {
 	}
 }
 
+// ClearAllFunc method - clears all the values in the array according to the set bits
+// and calls `f` for each cleared value
+func (a *Array[T]) ClearAllFunc(set *bitset.BitSet, f func(T)) {
+	for index, hasNext := set.NextSet(0); hasNext; index, hasNext = set.NextSet(index + 1) {
+		if index >= uint(len(a.container)) {
+			return
+		}
+		a.container[index] = a.empty
+		f(a.container[index])
+	}
+}
+
 // Clear method - clears the value at the given index
 func (a *Array[T]) Clear(index uint) {
 	a.container[index] = a.empty
