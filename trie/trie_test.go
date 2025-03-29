@@ -1,70 +1,11 @@
-package data
+package trie
 
 import (
+	"github.com/andrei-cosmin/sandata/chain"
 	"github.com/stretchr/testify/assert"
 	"slices"
 	"testing"
 )
-
-func getHead[K comparable](node *ChainNode[K]) *ChainNode[K] {
-	previous := node
-
-	for node != nil {
-		previous = node
-		node = node.PreviousChain
-	}
-
-	return previous
-}
-
-func getTail[K comparable](node *ChainNode[K]) *ChainNode[K] {
-	var next *ChainNode[K]
-
-	for node != nil {
-		next = node
-		node = node.NextChain
-	}
-
-	return next
-}
-
-// newChain - creates a new chain from the given keys
-func newChain[K comparable](keys []K) *ChainNode[K] {
-	// If there are no keys, return nil
-	if len(keys) == 0 {
-		return nil
-	}
-
-	// Create the root node
-	root := &ChainNode[K]{
-		Data: keys[0],
-	}
-
-	// Set previous to nil
-	var previous *ChainNode[K]
-	// Set the cursor to the root
-	cursor := root
-
-	// Iterate over the keys and create the chain
-	for index := 1; index < len(keys); index++ {
-		// Create the next node
-		cursor.NextChain = &ChainNode[K]{
-			Data: keys[index],
-		}
-		// Set the previous node
-		cursor.PreviousChain = previous
-
-		// Set the cursor to the next node
-		previous = cursor
-		cursor = cursor.NextChain
-	}
-
-	// Set the previous node of the last node
-	cursor.PreviousChain = previous
-
-	// Return the root of the chain
-	return root
-}
 
 type trieEntry struct {
 	keys  []string
@@ -99,6 +40,7 @@ var insertedEntries = []trieEntry{
 
 var invalidEntries = []trieEntry{
 	{keys: []string{"a", "b"}},
+	{keys: []string{"b"}},
 	{keys: []string{"a", "b", "cccc"}},
 	{keys: []string{"a", "b", "c", "x", "t"}},
 	{keys: []string{"a", "b", "c", "x", "d", "y"}},
@@ -115,7 +57,7 @@ func getInvalidEntries() []trieEntry {
 }
 
 func TestSearchKeys(t *testing.T) {
-	trie := NewTrie[string, int]()
+	trie := New[string, int]()
 
 	for _, entry := range insertedEntries {
 		trie.Insert(entry.keys, entry.value)
@@ -134,26 +76,26 @@ func TestSearchKeys(t *testing.T) {
 }
 
 func TestSearchChain(t *testing.T) {
-	trie := NewTrie[string, int]()
+	trie := New[string, int]()
 
 	for _, entry := range insertedEntries {
 		trie.Insert(entry.keys, entry.value)
 	}
 
 	for _, entry := range insertedEntries {
-		result, found := trie.SearchChain(newChain[string](entry.keys))
+		result, found := trie.SearchChain(chain.New[string](entry.keys))
 		assert.True(t, found)
 		assert.Equal(t, entry.value, result)
 	}
 	for _, entry := range getInvalidEntries() {
-		result, found := trie.SearchChain(newChain[string](entry.keys))
+		result, found := trie.SearchChain(chain.New[string](entry.keys))
 		assert.False(t, found)
 		assert.Equal(t, 0, result)
 	}
 }
 
 func TestIteratorOverArray(t *testing.T) {
-	trie := NewTrie[string, int]()
+	trie := New[string, int]()
 
 	for _, entry := range insertedEntries {
 		trie.Insert(entry.keys, entry.value)
@@ -161,83 +103,83 @@ func TestIteratorOverArray(t *testing.T) {
 
 	for _, entry := range insertedEntries {
 		keys := entry.keys
-		iterator := trie.Iterator()
+		iter := trie.Iterator()
 
 		index := 0
 		for index = range keys {
-			if !iterator.Next(keys[index]) {
+			if !iter.Next(keys[index]) {
 				break
 			}
 		}
 
-		assert.True(t, iterator.HasValue())
-		assert.Equal(t, entry.value, iterator.Value())
+		assert.True(t, iter.HasValue())
+		assert.Equal(t, entry.value, iter.Value())
 	}
 
 	for _, entry := range insertedEntries {
 		keys := entry.keys
-		iterator := trie.Iterator()
+		iter := trie.Iterator()
 
 		index := 0
-		for index < len(keys) && iterator.Next(keys[index]) {
+		for index < len(keys) && iter.Next(keys[index]) {
 			index++
 		}
 
-		assert.True(t, iterator.HasValue())
-		assert.Equal(t, entry.value, iterator.Value())
+		assert.True(t, iter.HasValue())
+		assert.Equal(t, entry.value, iter.Value())
 	}
 
 	for _, entry := range getInvalidEntries() {
 		keys := entry.keys
-		iterator := trie.Iterator()
+		iter := trie.Iterator()
 
 		for index := range keys {
-			if !iterator.Next(keys[index]) {
+			if !iter.Next(keys[index]) {
 				break
 			}
 		}
 
-		assert.False(t, iterator.HasValue())
+		assert.False(t, iter.HasValue())
 	}
 
 	for _, entry := range getInvalidEntries() {
 		keys := entry.keys
-		iterator := trie.Iterator()
+		iter := trie.Iterator()
 
 		index := 0
-		for index < len(keys) && iterator.Next(keys[index]) {
+		for index < len(keys) && iter.Next(keys[index]) {
 			index++
 		}
 
-		assert.False(t, iterator.HasValue())
+		assert.False(t, iter.HasValue())
 	}
 }
 
 func TestIteratorOverChain(t *testing.T) {
-	trie := NewTrie[string, int]()
+	trie := New[string, int]()
 
 	for _, entry := range insertedEntries {
 		trie.Insert(entry.keys, entry.value)
 	}
 
 	for _, entry := range insertedEntries {
-		chain := newChain[string](entry.keys)
-		iterator := trie.Iterator()
-		for chain != nil && iterator.Next(chain.Data) {
-			chain = chain.NextChain
+		cursor := chain.New[string](entry.keys)
+		iter := trie.Iterator()
+		for cursor != nil && iter.Next(cursor.Data) {
+			cursor = cursor.Next
 		}
 
-		assert.True(t, iterator.HasValue())
-		assert.Equal(t, entry.value, iterator.Value())
+		assert.True(t, iter.HasValue())
+		assert.Equal(t, entry.value, iter.Value())
 	}
 
 	for _, entry := range getInvalidEntries() {
-		chain := newChain[string](entry.keys)
-		iterator := trie.Iterator()
-		for chain != nil && iterator.Next(chain.Data) {
-			chain = chain.NextChain
+		cursor := chain.New[string](entry.keys)
+		iter := trie.Iterator()
+		for cursor != nil && iter.Next(cursor.Data) {
+			cursor = cursor.Next
 		}
 
-		assert.False(t, iterator.HasValue())
+		assert.False(t, iter.HasValue())
 	}
 }

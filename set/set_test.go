@@ -1,13 +1,19 @@
-package data
+package set
 
 import (
+	"github.com/andrei-cosmin/sandata/internal/testutil"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
+const (
+	defaultSize    = 1000
+	maxRandomValue = 100000
+)
+
 func TestSet_FilterFunc(t *testing.T) {
 	set := NewSet[uint](defaultSize)
-	values := getRandomUints(10*defaultSize, maxRandomValue)
+	values := testutil.RandomUInts(10*defaultSize, maxRandomValue)
 	for _, value := range values {
 		set.Insert(value & 1)
 	}

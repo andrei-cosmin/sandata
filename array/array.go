@@ -1,7 +1,8 @@
-package data
+package array
 
 import (
-	"github.com/andrei-cosmin/sandata/internal/util"
+	"github.com/andrei-cosmin/sandata/bit"
+	"github.com/andrei-cosmin/sandata/mathutil"
 	"slices"
 )
 
@@ -37,7 +38,7 @@ func (a *Array[T]) Size() uint {
 }
 
 // ClearAll method - clears all the values in the array according to the set bits
-func (a *Array[T]) ClearAll(bits Mask) {
+func (a *Array[T]) ClearAll(bits bit.Mask) {
 	for index, hasNext := bits.NextSet(0); hasNext && index < uint(len(a.container)); index, hasNext = bits.NextSet(index + 1) {
 		a.container[index] = a.empty
 	}
@@ -45,7 +46,7 @@ func (a *Array[T]) ClearAll(bits Mask) {
 
 // ClearAllFunc method - clears all the values in the array according to the set bits
 // and calls `f` for each cleared value
-func (a *Array[T]) ClearAllFunc(bits Mask, f func(T)) {
+func (a *Array[T]) ClearAllFunc(bits bit.Mask, f func(T)) {
 	for index, hasNext := bits.NextSet(0); hasNext && index < uint(len(a.container)); index, hasNext = bits.NextSet(index + 1) {
 		f(a.container[index])
 		a.container[index] = a.empty
@@ -60,7 +61,7 @@ func (a *Array[T]) Clear(index uint) {
 // ensureCapacity - ensures the array has the capacity to store the value at the given index
 func (a *Array[T]) ensureCapacity(index uint) {
 	if index >= uint(len(a.container)) {
-		a.container = slices.Grow(a.container, int(util.NextPowerOfTwo(index+1))-len(a.container))
+		a.container = slices.Grow(a.container, int(mathutil.NextPowerOfTwo(index+1))-len(a.container))
 		a.container = a.container[:cap(a.container)]
 	}
 }

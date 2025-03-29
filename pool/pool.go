@@ -1,4 +1,4 @@
-package data
+package pool
 
 // Pool - struct for a pool
 //   - cursor int - current cursor position
@@ -10,8 +10,8 @@ type Pool[T any] struct {
 	empty     T
 }
 
-// NewPool method - creates a new pool with the given capacity
-func NewPool[T any](capacity uint) *Pool[T] {
+// New method - creates a new pool with the given capacity
+func New[T any](capacity uint) *Pool[T] {
 	return &Pool[T]{
 		cursor:    -1,
 		container: make([]T, capacity),

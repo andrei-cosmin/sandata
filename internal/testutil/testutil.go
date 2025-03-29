@@ -1,14 +1,8 @@
-package data
+package testutil
 
 import "math/rand/v2"
 
-const (
-	defaultSize      = 1000
-	numArrayElements = 10000
-	maxRandomValue   = 100000
-)
-
-func getRandomUints(size int, maxValue uint) []uint {
+func RandomUInts(size int, maxValue uint) []uint {
 	mapped := make(map[uint]bool)
 	random := make([]uint, 0)
 

@@ -1,4 +1,4 @@
-package util
+package mathutil
 
 // NextPowerOfTwo - returns the next power of two for the given value
 func NextPowerOfTwo(value uint) uint {
