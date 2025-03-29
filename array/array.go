@@ -14,8 +14,8 @@ type Array[T any] struct {
 	empty     T
 }
 
-// NewArray method - creates a new array with the given size
-func NewArray[T any](size uint) *Array[T] {
+// New method - creates a new array with the given size
+func New[T any](size uint) *Array[T] {
 	return &Array[T]{
 		container: make([]T, size),
 	}

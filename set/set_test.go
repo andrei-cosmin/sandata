@@ -12,7 +12,7 @@ const (
 )
 
 func TestSet_FilterFunc(t *testing.T) {
-	set := NewSet[uint](defaultSize)
+	set := New[uint](defaultSize)
 	values := testutil.RandomUInts(10*defaultSize, maxRandomValue)
 	for _, value := range values {
 		set.Insert(value & 1)

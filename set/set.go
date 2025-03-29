@@ -6,8 +6,8 @@ type nothing struct{}
 // empty variable - represents an instance of an empty zero-alloc struct
 var empty = nothing{}
 
-// NewSet method - creates a new Set with pre-allocated memory for the given size
-func NewSet[T comparable](size int) *Set[T] {
+// New method - creates a new Set with pre-allocated memory for the given size
+func New[T comparable](size int) *Set[T] {
 	return &Set[T]{
 		keys: make(map[T]nothing, size),
 	}
@@ -15,7 +15,7 @@ func NewSet[T comparable](size int) *Set[T] {
 
 // From method - creates a new Set containing each key in the given slice
 func From[T comparable](keys []T) *Set[T] {
-	s := NewSet[T](len(keys))
+	s := New[T](len(keys))
 	s.InsertSlice(keys)
 	return s
 }
@@ -169,7 +169,7 @@ func (s *Set[T]) Empty() bool {
 //
 //	result = set.union(other) =>  result <- set ∪ other
 func (s *Set[T]) Union(other *Set[T]) *Set[T] {
-	result := NewSet[T](max(s.Size(), other.Size()))
+	result := New[T](max(s.Size(), other.Size()))
 
 	result.InsertSet(s)
 	result.InsertSet(other)
@@ -181,7 +181,7 @@ func (s *Set[T]) Union(other *Set[T]) *Set[T] {
 //
 //	result = set.difference(other) =>  result <- set \ other
 func (s *Set[T]) Difference(other *Set[T]) *Set[T] {
-	result := NewSet[T](max(0, s.Size()-other.Size()))
+	result := New[T](max(0, s.Size()-other.Size()))
 
 	for key := range s.keys {
 		if !other.Has(key) {
@@ -196,7 +196,7 @@ func (s *Set[T]) Difference(other *Set[T]) *Set[T] {
 //
 //	result = set.intersect(other) =>  result <- set ∩ other
 func (s *Set[T]) Intersect(set *Set[T]) *Set[T] {
-	result := NewSet[T](0)
+	result := New[T](0)
 	s1, s2 := sortSets(s, set)
 
 	for key := range s1.keys {
@@ -210,7 +210,7 @@ func (s *Set[T]) Intersect(set *Set[T]) *Set[T] {
 
 // Copy method - returns a copy of the current set
 func (s *Set[T]) Copy() *Set[T] {
-	other := NewSet[T](s.Size())
+	other := New[T](s.Size())
 	for key := range s.keys {
 		other.keys[key] = empty
 	}

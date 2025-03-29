@@ -18,7 +18,7 @@ const (
 
 func TestArray_Set(t *testing.T) {
 	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
-	array := NewArray[uint](defaultSize)
+	array := New[uint](defaultSize)
 
 	keys[0] = 100
 	for index := range numArrayElements {
@@ -32,7 +32,7 @@ func TestArray_Set(t *testing.T) {
 
 func TestArray_Clear(t *testing.T) {
 	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
-	array := NewArray[uint](defaultSize)
+	array := New[uint](defaultSize)
 
 	bits := bitset.New(defaultSize)
 	mask := bit.NewMask(bits)
@@ -52,7 +52,7 @@ func TestArray_Clear(t *testing.T) {
 
 func TestArray_ClearAllFunc(t *testing.T) {
 	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
-	array := NewArray[uint](defaultSize)
+	array := New[uint](defaultSize)
 
 	bits := bitset.New(defaultSize)
 	mask := bit.NewMask(bits)
