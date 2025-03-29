@@ -1,13 +1,13 @@
-package data
+package chain
 
-// ChainNode struct - represents a node in a double linked list
-//   - PreviousChain *ChainNode[T] - reference to the previous node in the list
-//   - NextChain *ChainNode[T] - reference to the next node in the list
-//   - Data T - the data which is stored in the node
-type ChainNode[T any] struct {
-	PreviousChain *ChainNode[T]
-	NextChain     *ChainNode[T]
-	Data          T
+// Node struct - represents a node in a double linked list
+//   - Prev *Node[T] - reference to the previous node in the list
+//   - Next *Node[T] - reference to the next node in the list
+//   - Data T - the trie which is stored in the node
+type Node[T any] struct {
+	Prev *Node[T]
+	Next *Node[T]
+	Data T
 }
 
 // RemoveNode method - removes the node from the list, and links the previous and next nodes together
@@ -15,26 +15,26 @@ type ChainNode[T any] struct {
 // Example (remove `B`):
 //
 //	A <-> B -> C  =>  A <-> C, B
-func (c *ChainNode[T]) RemoveNode() {
+func (c *Node[T]) RemoveNode() {
 	// Get the reference of the previous node
-	previous := c.PreviousChain
+	prev := c.Prev
 
 	// Get the reference of the next node
-	next := c.NextChain
+	next := c.Next
 
 	// If the previous node is not nil, link it to the next node
-	if previous != nil {
-		previous.NextChain = next
+	if prev != nil {
+		prev.Next = next
 	}
 
 	// If the next node is not nil, link it to the previous node
 	if next != nil {
-		next.PreviousChain = previous
+		next.Prev = prev
 	}
 
 	// Isolate the current node
-	c.PreviousChain = nil
-	c.NextChain = nil
+	c.Prev = nil
+	c.Next = nil
 }
 
 // InsertAsHead method - inserts the given node as the head of the list, and clears out references
@@ -47,28 +47,28 @@ func (c *ChainNode[T]) RemoveNode() {
 //	List with `B`: X <-> B <-> Y <-> Z <-> T
 //	List with `A`: C <-> A <-> D
 //	Result:	X <-> B <-> A <-> D, Y <-> Z <-> T, C
-func (c *ChainNode[T]) InsertAsHead(other *ChainNode[T]) {
+func (c *Node[T]) InsertAsHead(other *Node[T]) {
 	// Get the reference of the previous head
-	previous := other.PreviousChain
+	prev := other.Prev
 
 	// Get reference of the next node
-	next := c.NextChain
+	next := c.Next
 
 	// Disconnects the previous head from the [other] node
-	if previous != nil {
-		previous.NextChain = nil
+	if prev != nil {
+		prev.Next = nil
 	}
 
 	// Disconnects the previous tail from the current node
 	if next != nil {
-		next.PreviousChain = nil
+		next.Prev = nil
 	}
 
 	// Link the current node as head to the [other] node
-	c.NextChain = other
+	c.Next = other
 
 	// Link the [other] node as tail to the current node
-	other.PreviousChain = c
+	other.Prev = c
 }
 
 // Split method - splits the list at the current node
@@ -78,17 +78,17 @@ func (c *ChainNode[T]) InsertAsHead(other *ChainNode[T]) {
 // Example (split at `B`):
 //
 //	X <-> Y <-> B <-> Z <-> T  =>  X <-> Y, B <-> Z <-> T
-func (c *ChainNode[T]) Split() {
+func (c *Node[T]) Split() {
 	// Get the reference of the previous node
-	previous := c.PreviousChain
+	prev := c.Prev
 
 	// Set the previous node as the tail of the list
-	if previous != nil {
-		previous.NextChain = nil
+	if prev != nil {
+		prev.Next = nil
 	}
 
 	// Set the current node as the head of the list
-	c.PreviousChain = nil
+	c.Prev = nil
 }
 
 // InsertAsTail method - inserts the given node as the tail of the list, and clears out references
@@ -100,46 +100,108 @@ func (c *ChainNode[T]) Split() {
 //	List with `A`: C <-> A <-> D
 //	List with `B`: X <-> B <-> Y <-> Z <-> T
 //	Result:	X <-> B <-> A <-> D, Y <-> Z <-> T, C
-func (c *ChainNode[T]) InsertAsTail(other *ChainNode[T]) {
+func (c *Node[T]) InsertAsTail(other *Node[T]) {
 	// Get the reference of the previous head
-	previous := c.PreviousChain
+	prev := c.Prev
 
 	// Get reference of the next node
-	next := other.NextChain
+	next := other.Next
 
 	// Disconnects the previous head from the current node
-	if previous != nil {
-		previous.NextChain = nil
+	if prev != nil {
+		prev.Next = nil
 	}
 
 	// Disconnects the previous tail from the [other] node
 	if next != nil {
-		next.PreviousChain = nil
+		next.Prev = nil
 	}
 
 	// Link the current node as tail to the [other] node
-	c.PreviousChain = other
+	c.Prev = other
 
 	// Link the [other] node as head to the current node
-	other.NextChain = c
+	other.Next = c
 }
 
 // HasNext method - returns true if the current node has a next node
-func (c *ChainNode[T]) HasNext() bool {
-	return c.NextChain != nil
+func (c *Node[T]) HasNext() bool {
+	return c.Next != nil
 }
 
 // HasPrevious method - returns true if the current node has a previous node
-func (c *ChainNode[T]) HasPrevious() bool {
-	return c.PreviousChain != nil
+func (c *Node[T]) HasPrevious() bool {
+	return c.Prev != nil
 }
 
 // IsHead method - returns true if the current node is the head of the list
-func (c *ChainNode[T]) IsHead() bool {
-	return c.PreviousChain == nil
+func (c *Node[T]) IsHead() bool {
+	return c.Prev == nil
 }
 
 // IsTail method - returns true if the current node is the tail of the list
-func (c *ChainNode[T]) IsTail() bool {
-	return c.NextChain == nil
+func (c *Node[T]) IsTail() bool {
+	return c.Next == nil
+}
+
+// HeadOf function - returns the head of the chain
+func HeadOf[K comparable](node *Node[K]) *Node[K] {
+	previous := node
+
+	for node != nil {
+		previous = node
+		node = node.Prev
+	}
+
+	return previous
+}
+
+// TailOf function - returns the tail of the chain
+func TailOf[K comparable](node *Node[K]) *Node[K] {
+	var next *Node[K]
+
+	for node != nil {
+		next = node
+		node = node.Next
+	}
+
+	return next
+}
+
+// New - creates a new chain from the given keys
+func New[K comparable](keys []K) *Node[K] {
+	// If there are no keys, return nil
+	if len(keys) == 0 {
+		return nil
+	}
+
+	// Create the root node
+	root := &Node[K]{
+		Data: keys[0],
+	}
+
+	// Set previous to nil
+	var prev *Node[K]
+	// Set the cursor to the root
+	cursor := root
+
+	// Iterate over the keys and create the chain
+	for index := 1; index < len(keys); index++ {
+		// Create the next node
+		cursor.Next = &Node[K]{
+			Data: keys[index],
+		}
+		// Set the previous node
+		cursor.Prev = prev
+
+		// Set the cursor to the next node
+		prev = cursor
+		cursor = cursor.Next
+	}
+
+	// Set the previous node of the last node
+	cursor.Prev = prev
+
+	// Return the root of the chain
+	return root
 }

@@ -1,4 +1,4 @@
-package data
+package set
 
 // nothing struct - represents an empty zero-alloc struct
 type nothing struct{}
@@ -20,7 +20,7 @@ func From[T comparable](keys []T) *Set[T] {
 	return s
 }
 
-// Set struct - represents a set data structure
+// Set struct - represents a set trie structure
 //   - keys map[T]nothing - the container for the keys of the set
 type Set[T comparable] struct {
 	keys map[T]nothing

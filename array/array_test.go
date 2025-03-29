@@ -1,6 +1,8 @@
-package data
+package array
 
 import (
+	"github.com/andrei-cosmin/sandata/bit"
+	"github.com/andrei-cosmin/sandata/internal/testutil"
 	"github.com/bits-and-blooms/bitset"
 	"github.com/stretchr/testify/assert"
 	"math/rand/v2"
@@ -8,8 +10,14 @@ import (
 	"testing"
 )
 
+const (
+	defaultSize      = 1000
+	numArrayElements = 10000
+	maxRandomValue   = 100000
+)
+
 func TestArray_Set(t *testing.T) {
-	keys := getRandomUints(numArrayElements, maxRandomValue)
+	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
 	array := NewArray[uint](defaultSize)
 
 	keys[0] = 100
@@ -23,11 +31,11 @@ func TestArray_Set(t *testing.T) {
 }
 
 func TestArray_Clear(t *testing.T) {
-	keys := getRandomUints(numArrayElements, maxRandomValue)
+	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
 	array := NewArray[uint](defaultSize)
 
 	bits := bitset.New(defaultSize)
-	mask := NewMask(bits)
+	mask := bit.NewMask(bits)
 
 	for index := range numArrayElements {
 		array.Set(keys[index], keys[index])
@@ -43,11 +51,11 @@ func TestArray_Clear(t *testing.T) {
 }
 
 func TestArray_ClearAllFunc(t *testing.T) {
-	keys := getRandomUints(numArrayElements, maxRandomValue)
+	keys := testutil.RandomUInts(numArrayElements, maxRandomValue)
 	array := NewArray[uint](defaultSize)
 
 	bits := bitset.New(defaultSize)
-	mask := NewMask(bits)
+	mask := bit.NewMask(bits)
 
 	for index := range numArrayElements {
 		array.Set(keys[index], keys[index])

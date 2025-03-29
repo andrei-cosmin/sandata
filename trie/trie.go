@@ -1,63 +1,37 @@
-package data
+package trie
 
-// Iterator - interface for a generic trie iterator
-type Iterator[K comparable, V any] interface {
-	Next(K) bool
-	HasValue() bool
-	Value() V
-}
+import "github.com/andrei-cosmin/sandata/chain"
 
-// trieIterator - struct for a trie iterator
-type trieIterator[K comparable, V any] struct {
-	cursor *trieNode[K, V]
-}
-
-// Next - moves the iterator to the next node
-func (n *trieIterator[K, V]) Next(key K) bool {
-	n.cursor = n.cursor.paths[key]
-	return n.cursor != nil
-}
-
-// HasValue - checks if the current node has a value
-func (n *trieIterator[K, V]) HasValue() bool {
-	return n.cursor != nil && n.cursor.flag
-}
-
-// Value - returns the value of the current node
-func (n *trieIterator[K, V]) Value() V {
-	return n.cursor.data
-}
-
-// trieNode - struct for a trie node
-//   - paths map[K]*trieNode[K, V] - map of paths to other nodes
+// node - struct for a trie node
+//   - paths map[K]*node[K, V] - map of paths to other nodes
 //   - data V - data stored in the node
 //   - flag bool - flag to indicate if the node has a value
-type trieNode[K comparable, V any] struct {
-	paths map[K]*trieNode[K, V]
+type node[K comparable, V any] struct {
+	paths map[K]*node[K, V]
 	data  V
 	flag  bool
 }
 
 // Trie - struct for a trie
-//   - root *trieNode[K, V] - root node of the trie
+//   - root *node[K, V] - root node of the trie
 //   - empty V - empty value for the trie
 type Trie[K comparable, V any] struct {
-	root  *trieNode[K, V]
+	root  *node[K, V]
 	empty V
 }
 
-// NewTrie method - creates a new trie
-func NewTrie[K comparable, V any]() *Trie[K, V] {
+// New method - creates a new trie
+func New[K comparable, V any]() *Trie[K, V] {
 	return &Trie[K, V]{
-		root: &trieNode[K, V]{
-			paths: make(map[K]*trieNode[K, V]),
+		root: &node[K, V]{
+			paths: make(map[K]*node[K, V]),
 		},
 	}
 }
 
 // Iterator - returns a new iterator for the trie set to the root
 func (t *Trie[K, V]) Iterator() Iterator[K, V] {
-	return &trieIterator[K, V]{
+	return &iterator[K, V]{
 		cursor: t.root,
 	}
 }
@@ -77,7 +51,7 @@ func (t *Trie[K, V]) Insert(keys []K, value V) {
 
 		// Check if the key is in the paths, and create it, if it doesn't exist
 		if _, ok := cursor.paths[key]; !ok {
-			cursor.paths[key] = &trieNode[K, V]{}
+			cursor.paths[key] = &node[K, V]{}
 		}
 
 		// Move the cursor to the next node
@@ -85,12 +59,12 @@ func (t *Trie[K, V]) Insert(keys []K, value V) {
 
 		// Create the paths map, if it doesn't exist
 		if cursor.paths == nil {
-			cursor.paths = make(map[K]*trieNode[K, V])
+			cursor.paths = make(map[K]*node[K, V])
 		}
 	}
 
 	// Create the node for the last key, containing the value and the flag set to true
-	cursor.paths[lastKey] = &trieNode[K, V]{
+	cursor.paths[lastKey] = &node[K, V]{
 		data: value,
 		flag: true,
 	}
@@ -117,7 +91,7 @@ func (t *Trie[K, V]) SearchKeys(keys []K) (V, bool) {
 }
 
 // SearchChain - searches for a value in the trie using the given chain of keys
-func (t *Trie[K, V]) SearchChain(chain *ChainNode[K]) (V, bool) {
+func (t *Trie[K, V]) SearchChain(chain *chain.Node[K]) (V, bool) {
 	// Set the cursor to the root
 	cursor := t.root
 
@@ -135,7 +109,7 @@ func (t *Trie[K, V]) SearchChain(chain *ChainNode[K]) (V, bool) {
 
 		// Check if the chain has a next chain, and move the chain cursor to the next chain
 		if chain.HasNext() {
-			chain = chain.NextChain
+			chain = chain.Next
 		} else {
 			// Return the value and the flag of the cursor
 			return cursor.data, cursor.flag
