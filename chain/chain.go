@@ -1,6 +1,25 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2025 Andrei Casu-Pop
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+ * documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+ * Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+ * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 package chain
 
-// Node struct - represents a node in a double linked list
+// Node - represents a node in a double linked list
 //   - Prev *Node[T] - reference to the previous node in the list
 //   - Next *Node[T] - reference to the next node in the list
 //   - Data T - the trie which is stored in the node
@@ -10,7 +29,7 @@ type Node[T any] struct {
 	Data T
 }
 
-// RemoveNode method - removes the node from the list, and links the previous and next nodes together
+// RemoveNode - removes the node from the list, and links the previous and next nodes together
 //
 // Example (remove `B`):
 //
@@ -37,7 +56,7 @@ func (c *Node[T]) RemoveNode() {
 	c.Next = nil
 }
 
-// InsertAsHead method - inserts the given node as the head of the list, and clears out references
+// InsertAsHead - inserts the given node as the head of the list, and clears out references
 //
 // NOTE: the current node will become the head of the [other] node,
 // the [other] node will become the tail of the current node
@@ -71,7 +90,7 @@ func (c *Node[T]) InsertAsHead(other *Node[T]) {
 	other.Prev = c
 }
 
-// Split method - splits the list at the current node
+// Split - splits the list at the current node
 //
 // NOTE: the previous head will become a tail, the current node will become the head of a new list
 //
@@ -91,7 +110,7 @@ func (c *Node[T]) Split() {
 	c.Prev = nil
 }
 
-// InsertAsTail method - inserts the given node as the tail of the list, and clears out references
+// InsertAsTail - inserts the given node as the tail of the list, and clears out references
 //
 // NOTE: the current node will become the tail of the [other] node, the [other] node will become the head of the current node
 //
@@ -124,27 +143,27 @@ func (c *Node[T]) InsertAsTail(other *Node[T]) {
 	other.Next = c
 }
 
-// HasNext method - returns true if the current node has a next node
+// HasNext - returns true if the current node has a next node
 func (c *Node[T]) HasNext() bool {
 	return c.Next != nil
 }
 
-// HasPrevious method - returns true if the current node has a previous node
+// HasPrevious - returns true if the current node has a previous node
 func (c *Node[T]) HasPrevious() bool {
 	return c.Prev != nil
 }
 
-// IsHead method - returns true if the current node is the head of the list
+// IsHead - returns true if the current node is the head of the list
 func (c *Node[T]) IsHead() bool {
 	return c.Prev == nil
 }
 
-// IsTail method - returns true if the current node is the tail of the list
+// IsTail - returns true if the current node is the tail of the list
 func (c *Node[T]) IsTail() bool {
 	return c.Next == nil
 }
 
-// HeadOf function - returns the head of the chain
+// HeadOf - returns the head of the chain
 func HeadOf[K comparable](node *Node[K]) *Node[K] {
 	previous := node
 
@@ -156,7 +175,7 @@ func HeadOf[K comparable](node *Node[K]) *Node[K] {
 	return previous
 }
 
-// TailOf function - returns the tail of the chain
+// TailOf - returns the tail of the chain
 func TailOf[K comparable](node *Node[K]) *Node[K] {
 	var next *Node[K]
 
