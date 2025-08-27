@@ -29,9 +29,6 @@ type Mask interface {
 	// Test - returns whether ith bit is set
 	Test(index uint) bool
 
-	// Compact - shrinks BitSet to so that we preserve all set bits, while minimizing memory usage
-	Compact()
-
 	// String - returns a string representation of the Bitmap
 	String() string
 
